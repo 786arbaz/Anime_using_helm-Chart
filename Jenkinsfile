@@ -7,8 +7,8 @@ pipeline {
         DOCKERFILE_PATH = 'Dockerfile'
         ACR_NAME = 'redditclone.azurecr.io'
         AZURE_CREDENTIALS_ID = 'Azure'
-        HELM_CHART_PATH = 'Sakuna'
-        HELM_RELEASE_NAME = 'Sakuna'
+        HELM_CHART_PATH = 'sakuna-anime'
+        HELM_RELEASE_NAME = 'sakuna-anime'
         K8S_NAMESPACE = 'default'
         K8S_CREDENTIALS_ID = 'k8s' // Update with your actual Kubernetes credentials ID
     }
@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image from ${DOCKERFILE_PATH}"
-                    sh "docker build -t Sakuna:${BUILD_NUMBER} -f ${DOCKERFILE_PATH} ."
+                    sh "docker build -t sakuna-anime:${BUILD_NUMBER} -f ${DOCKERFILE_PATH} ."
                 }
             }
         }
@@ -46,10 +46,10 @@ pipeline {
                         sh "az acr login --name ${ACR_NAME}"
 
                         // Tag the Docker image for ACR
-                        sh "docker tag Sakuna:${BUILD_NUMBER} ${ACR_NAME}/Sakuna:${BUILD_NUMBER}"
+                        sh "docker tag sakuna-anime:${BUILD_NUMBER} ${ACR_NAME}/sakuna-anime:${BUILD_NUMBER}"
 
                         // Push the Docker image to ACR
-                        sh "docker push ${ACR_NAME}/Sakuna:${BUILD_NUMBER}"
+                        sh "docker push ${ACR_NAME}/sakuna-anime:${BUILD_NUMBER}"
 
                         // Log out from Azure CLI
                         sh "az logout"
@@ -84,7 +84,7 @@ pipeline {
                     ) {
                         // Deploy Helm chart
                         dir(HELM_CHART_PATH) {
-                            sh "helm upgrade --install ${HELM_RELEASE_NAME} . --namespace=${K8S_NAMESPACE} --set image.repository=${ACR_NAME}/Sakuna,image.tag=${BUILD_NUMBER}"
+                            sh "helm upgrade --install ${HELM_RELEASE_NAME} . --namespace=${K8S_NAMESPACE} --set image.repository=${ACR_NAME}/sakuna-anime,image.tag=${BUILD_NUMBER}"
                         }
                     }
                 }
@@ -96,7 +96,7 @@ pipeline {
         success {
             // Cleanup Jenkins workspace and remove Docker image if all stages are successful
             cleanWs()
-            sh "docker rmi -f ${ACR_NAME}/Sakuna:${BUILD_NUMBER}"
+            sh "docker rmi -f ${ACR_NAME}/sakuna-anime:${BUILD_NUMBER}"
         }
     }
 }
