@@ -63,6 +63,10 @@ pipeline {
             steps {
                 script {
                     def updatedAppVersion = "${BUILD_NUMBER}"
+                    // Assuming your Helm chart directory is 'sakuna-anime'
+                    // Set permissions for Chart.yaml
+                    sh "chmod 777 \${WORKSPACE}/${HELM_CHART_PATH}/Chart.yaml"
+                    sh "chmod 777 \${WORKSPACE}/${HELM_CHART_PATH}/values.yaml"
                     // Update appVersion in Chart.yaml with the current build number
                     sh 'sed -i "s|appVersion: .*|appVersion: \"${updatedAppVersion}\"|" ${HELM_CHART_PATH}/Chart.yaml'
 
